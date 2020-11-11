@@ -1,7 +1,19 @@
+def print_line_by_line(list_to_be_printed: []):
+    if len(list_to_be_printed):
+        for line in list_to_be_printed:
+            print(line)
+    else:
+        print("Empty")
+        
+        
 def add_len_of_sequence_to_dataset(dataset: []) -> ([], int):
     """To optimize performance and avoid checking of length of sequence every iteration, calculate the length once and
     save it in the dataset (as element with index 2 in the tuple).
-    Additionally, this function returns the maximum value of sequence length."""
+    Additionally, this function returns the maximum value of sequence length.
+
+    :param dataset: initial dataset
+    :return: (dataset_with_lengths, longest_sequence)
+    """
     longest_sequence = 0
     dataset_with_lengths = []
     for sequence_tuple in dataset:
@@ -12,15 +24,31 @@ def add_len_of_sequence_to_dataset(dataset: []) -> ([], int):
     return dataset_with_lengths, longest_sequence
 
 
-def print_line_by_line(list_to_be_printed: []):
-    if len(list_to_be_printed):
-        for line in list_to_be_printed:
-            print(line)
-    else:
-        print("Empty")
+def get_frequent_elements(dataset: [], min_support: float, iteration: int) -> []:
+    """Return list of elements, which in given iteration (under given list index in all sequences) occurred at least
+    min_support times in the whole dataset (all sequences).
+
+    :param dataset: dataset with sequence lengths
+    :param min_support: minimum support
+    :param iteration: stats from 0. Specifies which index from sequence list (sequence_tuple[1]) should be considered
+    :return: list of frequent elements
+    """
+    elements_with_occurrences = {}
+    for sequence_tuple in dataset:
+        if sequence_tuple[2] >= iteration:
+            element = sequence_tuple[1][iteration - 1]
+            if element in elements_with_occurrences.keys():
+                elements_with_occurrences[element] += 1
+            else:
+                elements_with_occurrences[element] = 1
+    frequent_elements = []
+    for element, occurrences in elements_with_occurrences.items():
+        if occurrences >= min_support:
+            frequent_elements.append(element)
+    return frequent_elements
 
 
-def apriori_s(dataset: [], min_sup: float):
+def apriori_s(dataset: [], min_support: float):
     print("Original dataset:")
     print_line_by_line(dataset)
 
@@ -28,7 +56,9 @@ def apriori_s(dataset: [], min_sup: float):
     print("\nDataset with added lengths of sequences (index number 2 in the tuple):")
     print_line_by_line(dataset_with_lengths)
 
-    # for i in range(0, maximum_sequence_length):
+    for i in range(1, maximum_sequence_length + 1):
+        frequent_elements = get_frequent_elements(dataset_with_lengths, min_support, i)
+        print("Frequent elements in iteration {}: {}".format(i, frequent_elements))
 
 
 def main():
@@ -49,8 +79,8 @@ def main():
                 ('14', ['p3', 'p1', 'p4', 'p1']),
                 ('15', ['p2', 'p1', 'p3', 'p4'])
     ]
-    min_sup = 2
-    apriori_s(dataset, min_sup)
+    min_support = 2
+    apriori_s(dataset, min_support)
 
 
 if __name__ == '__main__':
