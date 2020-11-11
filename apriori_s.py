@@ -1,11 +1,15 @@
-def add_len_of_sequence_to_dataset(dataset: []) -> []:
+def add_len_of_sequence_to_dataset(dataset: []) -> ([], int):
     """To optimize performance and avoid checking of length of sequence every iteration, calculate the length once and
-    save it in the dataset (as element with index 2 in the tuple)"""
+    save it in the dataset (as element with index 2 in the tuple).
+    Additionally, this function returns the maximum value of sequence length."""
+    longest_sequence = 0
     dataset_with_lengths = []
     for sequence_tuple in dataset:
         length_of_sequence = len(sequence_tuple[1])
         dataset_with_lengths.append(sequence_tuple + (length_of_sequence,))
-    return dataset_with_lengths
+        if length_of_sequence > longest_sequence:
+            longest_sequence = length_of_sequence
+    return dataset_with_lengths, longest_sequence
 
 
 def print_line_by_line(list_to_be_printed: []):
@@ -20,9 +24,11 @@ def apriori_s(dataset: [], min_sup: float):
     print("Original dataset:")
     print_line_by_line(dataset)
 
-    dataset_with_lengths = add_len_of_sequence_to_dataset(dataset)
+    dataset_with_lengths, maximum_sequence_length = add_len_of_sequence_to_dataset(dataset)
     print("\nDataset with added lengths of sequences (index number 2 in the tuple):")
     print_line_by_line(dataset_with_lengths)
+
+    # for i in range(0, maximum_sequence_length):
 
 
 def main():
