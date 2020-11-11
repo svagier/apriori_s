@@ -48,6 +48,36 @@ def get_frequent_elements(dataset: [], min_support: float, iteration: int) -> []
     return frequent_elements
 
 
+def get_candidate_sequences(current_frequent_elements: [], previous_frequent_sequences: []) -> []:
+    if previous_frequent_sequences:
+        candidate_sequences = []
+        for seq in previous_frequent_sequences:
+            print(type(seq))
+            for frequent_elem in current_frequent_elements:
+                if seq[-1] != frequent_elem:
+                    candidate_sequences.append(seq + [frequent_elem])
+        return candidate_sequences
+    else:
+        return [[element] for element in current_frequent_elements]
+
+
+def get_candidate_sequences_with_support(dataset: [], candidate_sequences_without_sup: []) -> []:
+    candidate_sequences_with_support = []
+    for candidate_seq in candidate_sequences_without_sup:
+        occurrences = 0
+        for seq_tuple in dataset:
+            iter = 0
+            for element in candidate_seq:
+                if element == seq_tuple[1][iter]:
+                    iter += 1
+                else:
+                    break
+            if iter == len(candidate_seq):
+                occurrences += 1
+        candidate_sequences_with_support.append((candidate_seq, occurrences))
+    return candidate_sequences_with_support
+
+
 def apriori_s(dataset: [], min_support: float):
     print("Original dataset:")
     print_line_by_line(dataset)
@@ -56,9 +86,16 @@ def apriori_s(dataset: [], min_support: float):
     print("\nDataset with added lengths of sequences (index number 2 in the tuple):")
     print_line_by_line(dataset_with_lengths)
 
+    previous_frequent_sequences = None
     for i in range(1, maximum_sequence_length + 1):
         frequent_elements = get_frequent_elements(dataset_with_lengths, min_support, i)
         print("Frequent elements in iteration {}: {}".format(i, frequent_elements))
+        cs_without_support = get_candidate_sequences(frequent_elements, previous_frequent_sequences)
+        # print("Candidate sequences without support in iteration {}:".format(i))
+        # print_line_by_line(cs_without_support)
+        cs_with_support = get_candidate_sequences_with_support(dataset, cs_without_support)
+        print("Candidate sequences with support in iteration {}:".format(i))
+        print_line_by_line(cs_with_support)
 
 
 def main():
