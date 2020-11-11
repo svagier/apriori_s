@@ -30,7 +30,7 @@ def get_frequent_elements(dataset: [], min_support: float, iteration: int) -> []
 
     :param dataset: dataset with sequence lengths
     :param min_support: minimum support
-    :param iteration: stats from 0. Specifies which index from sequence list (sequence_tuple[1]) should be considered
+    :param iteration: starts from 1. Specifies which index from sequence list (sequence_tuple[1]) should be considered
     :return: list of frequent elements
     """
     elements_with_occurrences = {}
@@ -52,7 +52,6 @@ def get_candidate_sequences(current_frequent_elements: [], previous_frequent_seq
     if previous_frequent_sequences:
         candidate_sequences = []
         for seq in previous_frequent_sequences:
-            print(type(seq))
             for frequent_elem in current_frequent_elements:
                 if seq[-1] != frequent_elem:
                     candidate_sequences.append(seq + [frequent_elem])
@@ -78,6 +77,14 @@ def get_candidate_sequences_with_support(dataset: [], candidate_sequences_withou
     return candidate_sequences_with_support
 
 
+def get_frequent_sequences(candidate_sequences_with_support: [], min_support: float) -> []:
+    frequent_sequences = []
+    for cs in candidate_sequences_with_support:
+        if cs[1] >= min_support:
+            frequent_sequences.append(cs[0])
+    return frequent_sequences
+
+
 def apriori_s(dataset: [], min_support: float):
     print("Original dataset:")
     print_line_by_line(dataset)
@@ -88,6 +95,7 @@ def apriori_s(dataset: [], min_support: float):
 
     previous_frequent_sequences = None
     for i in range(1, maximum_sequence_length + 1):
+        print("\n------- ITERATION {} -------".format(i))
         frequent_elements = get_frequent_elements(dataset_with_lengths, min_support, i)
         print("Frequent elements in iteration {}: {}".format(i, frequent_elements))
         cs_without_support = get_candidate_sequences(frequent_elements, previous_frequent_sequences)
@@ -96,6 +104,10 @@ def apriori_s(dataset: [], min_support: float):
         cs_with_support = get_candidate_sequences_with_support(dataset, cs_without_support)
         print("Candidate sequences with support in iteration {}:".format(i))
         print_line_by_line(cs_with_support)
+        frequent_sequences = get_frequent_sequences(cs_with_support, min_support)
+        previous_frequent_sequences = frequent_sequences
+        print("Frequent sequences in iteration {}:".format(i))
+        print_line_by_line(frequent_sequences)
 
 
 def main():
